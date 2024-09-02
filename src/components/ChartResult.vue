@@ -66,8 +66,6 @@ export default {
         videoDiv.value.append(video);
         await this.processVideoTrack(video.value);
         // TODO allow user to remove/replace current file
-        videoDiv.value.style.display = 'grid';
-        videoControls.value.style.display = 'flex';
       };
 
       fileReader.readAsDataURL(file);
@@ -383,7 +381,7 @@ export default {
 
 <style scoped>
 #video-frame {
-  /* display: none; */
+  display: grid;
   height: 100%;
   width: 100%;
   position: absolute;
@@ -392,7 +390,7 @@ export default {
 }
 
 #controls {
-  /* display: none; */
+  display: flex;
   position: absolute;
   bottom: 0;
   height: 50px;
@@ -402,11 +400,11 @@ export default {
 }
 
 #download-btn {
-  /* display: none; */
+  display: none;
 }
 
 #reset-zoom-btn {
-  /* display: none; */
+  display: block;
   width: 30px;
   padding: 0;
 }
@@ -433,7 +431,6 @@ export default {
   height: 100%;
   width: 100%;
   position: absolute;
-  /* display: none; */
   z-index: 3;
 }
 
