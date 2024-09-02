@@ -12,31 +12,29 @@
 <script>
 import { ref } from 'vue';
 
-
 const dragArea = ref(null)
 const fileInput = ref(null)
 const dragText = ref(null)
 
-function validateFile() {
-  console.log(file)
-}
 
 export default {
   name: 'UploadFile',
-  props: {
-    file: Blob | undefined
-  },
   setup() {
     return { dragArea, fileInput, dragText };
+  },
+  data() {
+    return { fileBlob: this.fileBlob }
   },
   methods: {
     onClick() {
       fileInput.value.click()
     },
-    onChange() {
-      file = this.files[0];
-      dragArea.value.classList.add('active');
-      validateFile();
+    onChange(e) {
+      const target = e.target;
+      if (target && target.files) {
+        dragArea.value.classList.add('active');
+        this.validateFile(target.files[0]);
+      }
     },
     onDragover() {
       dragArea.value.classList.add('active');
@@ -47,9 +45,28 @@ export default {
       dragText.value.textContent = 'drag & drop to upload video';
     },
     onDrop(e) {
-      file = e.dataTransfer.files[0];
-      validateFile();
-    }
+      this.validateFile(e.dataTransfer.files[0]);
+    },
+    validateFile(file) {
+      const fileType = file.type;
+      // TODO 'video/quicktime', .gif, and other file types to be demuxed and supported
+      let vidExts = ['video/mp4', 'video/ogg', 'video/webm'];
+      let imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (vidExts.includes(fileType)) {
+        this.goToResult(file);
+
+      } else if (imgExts.includes(fileType)) {
+        // TODO calculate as one frame
+        alert('Image detected');
+      } else {
+        alert('This is not a supported file');
+        dragArea.value.classList.remove('active');
+        dragText.value.textContent = 'drag & drop to upload video';
+      }
+    },
+    goToResult(file) {
+      this.$router.replace({ name: 'Result', params: { fileBlob: file } });
+    },
   }
 }
 </script>
@@ -57,7 +74,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #drag-area {
-  border: 2px dashed #fff;
+  border: 2px dashed #5256ad;
   height: 80vh;
   width: 80%;
   border-radius: 5px;
@@ -69,24 +86,24 @@ export default {
 }
 
 #drag-area.active {
-  border: 2px solid #fff;
+  border: 2px solid #5256ad;
 }
 
 #drag-area .icon {
   font-size: 100px;
-  color: #fff;
+  color: #5256ad;
 }
 
 #drag-area-header {
   font-size: 30px;
   font-weight: 500;
-  color: #fff;
+  color: #5256ad;
 }
 
 #drag-area-span {
   font-size: 25px;
   font-weight: 500;
-  color: #fff;
+  color: #5256ad;
   margin: 10px 0 15px 0;
 }
 
@@ -96,8 +113,8 @@ export default {
   font-weight: 500;
   border: none;
   outline: none;
-  background: #fff;
-  color: #5256ad;
+  background: #5256ad;
+  color: #111;
   border-radius: 5px;
   cursor: pointer;
 }

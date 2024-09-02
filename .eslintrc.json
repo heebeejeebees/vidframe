@@ -1,5 +1,13 @@
 {
-  "env": {
-    "amd": true
-  }
+  "rules": {
+    "quotes": [2, "double"]
+  },
+  "overrides": [
+    {
+      "files": ["public/scripts/*.js"],
+      "env": {
+        "amd": true
+      }
+    }
+  ]
 }

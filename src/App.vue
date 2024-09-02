@@ -1,6 +1,6 @@
 <template>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-  <RouterView />
+  <RouterView :fileBlob="fileBlob" />
 </template>
 
 <script>
@@ -10,6 +10,9 @@ export default {
   name: 'App',
   components: {
     UploadFile
+  },
+  data() {
+    return { fileBlob: null }
   },
   mounted() {
     const openCvScript = document.createElement('script')
@@ -37,6 +40,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #5256ad;
+  background: #111;
+}
+
+.btn {
+  padding: 0 5px 0 5px;
 }
 </style>

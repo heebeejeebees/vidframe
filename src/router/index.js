@@ -4,23 +4,28 @@ import HelloWorld from "@/components/HelloWorld.vue";
 import ChartResult from "@/components/ChartResult.vue";
 
 const router = createRouter({
-  history: createWebHistory(""),
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
-      name: "home",
+      name: "Home",
       component: UploadFile,
-      children: [
-        {
-          path: '/result',
-          component: ChartResult
-        }
-      ]
+    },
+    {
+      path: "/result",
+      name: "Result",
+      component: ChartResult,
+      props: true// (route) => ({ fileBlob: route.params.fileBlob }),
     },
     {
       path: "/hello",
-      name: "hello",
+      name: "Hello",
       component: HelloWorld,
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "NotFound",
+      redirect: "/",
     },
   ],
 });
