@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import blobStore from '@/store';
 import { ref } from 'vue';
 
 const dragArea = ref(null)
@@ -21,9 +22,6 @@ export default {
   name: 'UploadFile',
   setup() {
     return { dragArea, fileInput, dragText };
-  },
-  data() {
-    return { fileBlob: this.fileBlob }
   },
   methods: {
     onClick() {
@@ -53,8 +51,8 @@ export default {
       let vidExts = ['video/mp4', 'video/ogg', 'video/webm'];
       let imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
       if (vidExts.includes(fileType)) {
-        this.goToResult(file);
-
+        blobStore.mutations.setBlob(file);
+        this.goToResult();
       } else if (imgExts.includes(fileType)) {
         // TODO calculate as one frame
         alert('Image detected');
@@ -64,8 +62,8 @@ export default {
         dragText.value.textContent = 'drag & drop to upload video';
       }
     },
-    goToResult(file) {
-      this.$router.replace({ name: 'Result', params: { fileBlob: file } });
+    goToResult() {
+      this.$router.replace({ name: 'Result' });
     },
   }
 }

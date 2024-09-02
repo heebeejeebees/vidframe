@@ -9,12 +9,15 @@
     <canvas id="timeline" ref="timelineCanvas"></canvas>
     <canvas id="annotation" ref="annotCanvas"></canvas>
     <canvas id="frame" ref="frameCanvas"></canvas>
-    <video id="video" ref="video" muted crossorigin="anonymous"></video>
+    <video id="video" ref="video" muted crossorigin="anonymous" playbackRate="1"></video>
   </div>
 </template>
 
 <script>
+import blobStore from '@/store';
 import { ref } from 'vue';
+import Chart from 'chart.js/auto';
+import { transformMicrosecondsToTimestamp, canvasDrawImage, getLaplacianVar } from '../utils';
 
 const videoDiv = ref(null)
 const video = ref(null)
@@ -33,12 +36,13 @@ let offscreenCtx;
 
 export default {
   name: 'ChartResult',
-  props: {
-    fileBlob: { type: Blob }
-  },
   mounted() {
-    console.log(this.fileBlob);
-    this.processVideo(this.$router.params.fileBlob);
+    const file = blobStore.getters.getBlob();
+    if (file) {
+      this.processVideo(file);
+    } else {
+      this.goHome();
+    }
   },
   setup() {
     return {
@@ -54,15 +58,13 @@ export default {
   },
   methods: {
     processVideo(file) {
-      let fileReader = new FileReader();
+      const fileReader = new FileReader();
       fileReader.onload = async () => {
 
         video.value.src = fileReader.result;
-        video.value.type = fileType;
-        // TODO remove after DEV
-        video.value.playbackRate = 1;
+        video.value.type = file.type;
         videoDiv.value.append(video);
-        await this.processVideoTrack();
+        await this.processVideoTrack(video.value);
         // TODO allow user to remove/replace current file
         videoDiv.value.style.display = 'grid';
         videoControls.value.style.display = 'flex';
@@ -73,7 +75,7 @@ export default {
     /**
      * main function to process video after upload
      */
-    async processVideoTrack() {
+    async processVideoTrack(video) {
       {
         if (window.MediaStreamTrackProcessor) {
           this.readChunk(new MediaStreamTrackProcessor(await this.getVideoTrack(video)));
@@ -89,6 +91,7 @@ export default {
      * @param {MediaStreamTrackProcessor} processor of uploaded HTMLElement video
      */
     readChunk(processor) {
+      const self = this;
       const reader = processor.readable.getReader();
       let hasWarned = false;
       reader.read().then(async function processFrames({ done, value }) {
@@ -111,7 +114,7 @@ export default {
           // calculate laplacian variance
           let lapVar = null;
           try {
-            lapVar = this.getLaplacianVar(offscreenCanvas);
+            lapVar = getLaplacianVar(offscreenCanvas);
           } catch (e) {
             if (!hasWarned) {
               hasWarned = true;
@@ -141,7 +144,7 @@ export default {
             `video processed: ${frames.length} frames, ${frames[frames.length - 1].timestamp
             }`
           );
-          this.plotTimeline(frames);
+          self.plotTimeline(frames);
         }
       });
     },
@@ -163,56 +166,6 @@ export default {
         video.remove();
       };
       return track;
-    },
-
-    /**
-     * to calculate laplacian variance per video frame from OffscreenCanvas
-     * https://stackoverflow.com/a/72288032
-     * @returns laplacian variance float, higher = clearer
-     */
-    getLaplacianVar(offscreenCanvas) {
-      /* opencv starts */
-      try {
-        // get image
-        const cvImage = cv.imread(offscreenCanvas);
-
-        // convert to gray scale
-        const grayImage = new cv.Mat();
-        cv.cvtColor(cvImage, grayImage, cv.COLOR_RGBA2GRAY);
-        cvImage.delete();
-
-        // TODO let user choose accuracy on RAM expense
-        // CV_8S  : low
-        // CV_16S : mid
-        // CV_32F : high
-        // CV_64F : extra high
-        const CV_TYPE = cv.CV_64F;
-
-        // calculate laplacian
-        const laplacianMat = new cv.Mat();
-        cv.Laplacian(grayImage, laplacianMat, CV_TYPE);
-        grayImage.delete();
-
-        // calculate standard deviation
-        const standardDeviationMat = new cv.Mat(1, 4, CV_TYPE);
-        cv.meanStdDev(
-          laplacianMat,
-          standardDeviationMat.clone(),
-          standardDeviationMat
-        );
-        laplacianMat.delete();
-
-        // calculate variance
-        const standardDeviation = standardDeviationMat.doubleAt(0, 0);
-        standardDeviationMat.delete();
-        return standardDeviation * standardDeviation;
-      } catch (e) {
-        if (typeof e === 'number') {
-          throw new Error(
-            'Video processing failed, try trimming, converting, or resize your video'
-          );
-        }
-      }
     },
 
     /**
@@ -242,7 +195,7 @@ export default {
         willReadFrequently: true,
       });
       annotCtx.clearRect(0, 0, annotCanvas.value.width, annotCanvas.value.height);
-      drawVerticalLineFromX(annotCtx, axisY, pixelX, 'rgba(1,1,1,1)', 2);
+      this.drawVerticalLineFromX(annotCtx, axisY, pixelX, 'rgba(1,1,1,1)', 2);
     }
     ,
     /**
@@ -256,7 +209,7 @@ export default {
         willReadFrequently: true,
       });
       // show selected video frame
-      this.canvasDrawImage(frameCanvas.value, frameCtx, /* frames[dataX]. */ bitmap);
+      canvasDrawImage(frameCanvas.value, frameCtx, /* frames[dataX]. */ bitmap);
       // draw selected frame vertical line
       this.clearAndDrawAnnotation(axisY, pixelX);
     },
@@ -406,7 +359,7 @@ export default {
                     willReadFrequently: true,
                   });
                   timelineCtx.save();
-                  drawVerticalLineFromX(
+                  this.drawVerticalLineFromX(
                     timelineCtx,
                     axisY,
                     pixelX,
@@ -420,6 +373,9 @@ export default {
           },
         ],
       });
+    },
+    goHome() {
+      this.$router.replace({ name: 'Home' });
     }
   }
 }

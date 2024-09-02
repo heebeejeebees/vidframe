@@ -15,7 +15,6 @@ const router = createRouter({
       path: "/result",
       name: "Result",
       component: ChartResult,
-      props: true// (route) => ({ fileBlob: route.params.fileBlob }),
     },
     {
       path: "/hello",
