@@ -1,0 +1,4 @@
+# Start by ignoring everything by default
+src/**/*.js
+src/**/*.vue
+# Enable linting just for some files

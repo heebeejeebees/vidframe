@@ -12,7 +12,6 @@
 <script>
 import { ref } from 'vue';
 
-let file;
 
 const dragArea = ref(null)
 const fileInput = ref(null)
@@ -25,7 +24,7 @@ function validateFile() {
 export default {
   name: 'UploadFile',
   props: {
-    video: undefined
+    file: Blob | undefined
   },
   setup() {
     return { dragArea, fileInput, dragText };
