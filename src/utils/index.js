@@ -9,12 +9,22 @@ export function customErrorMessage(title, message) {
  * convert microsecond timestamp of VideoFrame to timestamp string
  */
 export function transformMicrosecondsToTimestamp(microseconds) {
-  const SSSSSS = microseconds % 1000000;
-  const seconds = Math.floor(microseconds / 1000000);
-  const secsNoMins = seconds % 60;
-  const ss = secsNoMins < 10 ? `0${secsNoMins}` : secsNoMins.toString();
-  const mm = Math.floor(seconds / 60);
-  return `${mm}:${ss}.${SSSSSS}`;
+  if (microseconds <= 0) {
+    return "00:00.000000";
+  }
+
+  const totalSeconds = Math.floor(microseconds / 1000000);
+  const remainingMicroseconds = microseconds % 1000000;
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  // Format with leading zeros
+  const formattedMinutes = String(minutes).padStart(2, "0");
+  const formattedSeconds = String(seconds).padStart(2, "0");
+  const formattedMicroseconds = String(remainingMicroseconds).padStart(6, "0");
+
+  return `${formattedMinutes}:${formattedSeconds}.${formattedMicroseconds}`;
 }
 
 /**

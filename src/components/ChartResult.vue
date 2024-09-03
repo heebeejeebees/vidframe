@@ -63,7 +63,7 @@ export default {
 
         video.value.src = fileReader.result;
         video.value.type = file.type;
-        videoWrapper.value.append(video);
+        videoWrapper.value.append(video.value);
         await this.processVideoTrack(video.value);
         // TODO allow user to remove/replace current file
       };
@@ -97,7 +97,10 @@ export default {
       const self = this;
       const reader = processor.readable.getReader();
       let hasWarned = false;
+      let microsecondsOffset = null;
       reader.read().then(async function processFrames({ done, value }) {
+        // `value` type == VideoFrame
+        // see https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
         if (value) {
           const bitmap = await createImageBitmap(value);
 
@@ -126,14 +129,19 @@ export default {
             lapVar = 0;
           }
 
+          // to offset days worth of extra microseconds, as it still increments as video plays
+          if (microsecondsOffset == null) {
+            microsecondsOffset = value.timestamp;
+          }
+
           frames.push({
             index: frames.length,
             bitmap,
             data: {
               laplacian_variance: lapVar,
             },
-            timestamp: transformMicrosecondsToTimestamp(value.timestamp),
-            timestamp_microseconds: value.timestamp,
+            timestamp: transformMicrosecondsToTimestamp(value.timestamp - microsecondsOffset),
+            timestamp_microseconds: value.timestamp - microsecondsOffset,
           });
           value.close();
         }
@@ -144,7 +152,7 @@ export default {
           offscreenCanvas = null;
           offscreenCtx = null;
           console.log(
-            `video processed: ${frames.length} frames, ${frames[frames.length - 1].timestamp
+            `video processed: ${frames.length} frames, ${frames[frames.length - 1].timestamp_microseconds
             }`
           );
           self.plotTimeline(frames);
@@ -345,7 +353,7 @@ export default {
                 // update download
                 downloadBtn.value.onclick = () => {
                   const downloadLink = document.createElement('a');
-                  downloadLink.download = 'videostills.png';
+                  downloadLink.download = `${frames[dataX].timestamp} picked by vidfra.me.png`;
                   downloadLink.href = frameCanvas.value.toDataURL();
                   downloadLink.click();
                 };
@@ -412,7 +420,7 @@ export default {
 }
 
 #reset-zoom-btn {
-  display: block;
+  display: none;
   width: 30px;
   padding: 0;
 }

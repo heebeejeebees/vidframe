@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper">
+  <div id="container">
     <button id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
       @drop.prevent="onDrop($event)" @click="onClick()">
       <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
@@ -72,7 +72,7 @@ export default {
 </script>
 
 <style scoped>
-#wrapper {
+#container {
   flex: 1;
   display: flex;
 }

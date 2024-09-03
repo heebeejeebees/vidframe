@@ -1,6 +1,10 @@
 <template>
-  <div id="wrapper">
+  <div id="container">
     <h1>Dashboard</h1>
+    <h3>What does it do</h3>
+    <h3>Browser Compatibility</h3>
+    <h3>Future Enhancements</h3>
+    <h3>Feedback?</h3>
   </div>
 </template>
 
@@ -11,11 +15,12 @@ export default {
 </script>
 
 <style scoped>
-#wrapper {
+#container {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--background-color)
+  background: var(--background-color);
+  flex-direction: column;
 }
 </style>
