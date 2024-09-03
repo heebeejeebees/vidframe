@@ -1,12 +1,12 @@
 <template>
-  <div id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
-    @drop.prevent="onDrop($event)">
-    <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+  <button id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
+    @drop.prevent="onDrop($event)" @click="onClick()">
+    <div class=" icon"><i class="fas fa-cloud-upload-alt"></i></div>
     <header id="drag-area-header" ref="dragText">drag & drop to upload video</header>
     <span id="drag-area-span">- or -</span>
     <button id="browse-btn" @click="onClick()">browse file</button>
     <input id="file-input" type="file" hidden ref="fileInput" @change="onChange($event)">
-  </div>
+  </button>
 </template>
 
 <script>
@@ -69,10 +69,10 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #drag-area {
-  border: 2px dashed #5256ad;
+  border: 2px dashed var(--primary-color);
+  background: var(--secondary-color);
   height: 80vh;
   width: 80%;
   border-radius: 5px;
@@ -84,24 +84,24 @@ export default {
 }
 
 #drag-area.active {
-  border: 2px solid #5256ad;
+  border: 2px solid var(--primary-color);
 }
 
 #drag-area .icon {
   font-size: 100px;
-  color: #5256ad;
+  color: var(--primary-color);
 }
 
 #drag-area-header {
   font-size: 30px;
   font-weight: 500;
-  color: #5256ad;
+  color: var(--primary-color);
 }
 
 #drag-area-span {
   font-size: 25px;
   font-weight: 500;
-  color: #5256ad;
+  color: var(--primary-color);
   margin: 10px 0 15px 0;
 }
 
@@ -111,8 +111,8 @@ export default {
   font-weight: 500;
   border: none;
   outline: none;
-  background: #5256ad;
-  color: #111;
+  background: var(--tertiary-color);
+  color: var(--secondary-color);
   border-radius: 5px;
   cursor: pointer;
 }

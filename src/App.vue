@@ -1,6 +1,8 @@
 <template>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-  <RouterView />
+  <div id="app" :style="cssProps">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <RouterView />
+  </div>
 </template>
 
 <script>
@@ -16,6 +18,16 @@ export default {
     openCvScript.src = "./scripts/opencv.js"
     openCvScript.type = "text/javascript"
     document.head.appendChild(openCvScript)
+  },
+  computed: {
+    cssProps() {
+      return {
+        '--background-color': '#121212',
+        '--primary-color': '#BB86FC',
+        '--secondary-color': '#1F1B24',
+        '--tertiary-color': '#03DAC5'
+      }
+    }
   }
 }
 </script>
@@ -37,7 +49,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #111;
+  background: var(--background-color);
 }
 
 .btn {
