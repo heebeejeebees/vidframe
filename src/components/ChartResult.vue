@@ -1,5 +1,5 @@
 <template>
-  <div id="video-frame" ref="videoDiv">
+  <div id="video-wrapper" ref="videoWrapper">
     <div id="controls" ref="videoControls">
       <button id="download-btn" class="btn" ref="downloadBtn">download</button>
       <button id="reset-zoom-btn" class="btn" ref="resetZoomBtn">
@@ -19,7 +19,7 @@ import { ref } from 'vue';
 import Chart from 'chart.js/auto';
 import { transformMicrosecondsToTimestamp, canvasDrawImage, getLaplacianVar } from '../utils';
 
-const videoDiv = ref(null)
+const videoWrapper = ref(null)
 const video = ref(null)
 const videoControls = ref(null)
 
@@ -46,7 +46,7 @@ export default {
   },
   setup() {
     return {
-      videoDiv,
+      videoWrapper,
       video,
       videoControls,
       timelineCanvas,
@@ -63,7 +63,7 @@ export default {
 
         video.value.src = fileReader.result;
         video.value.type = file.type;
-        videoDiv.value.append(video);
+        videoWrapper.value.append(video);
         await this.processVideoTrack(video.value);
         // TODO allow user to remove/replace current file
       };
@@ -388,7 +388,7 @@ export default {
 </script>
 
 <style scoped>
-#video-frame {
+#video-wrapper {
   display: grid;
   height: 100%;
   width: 100%;

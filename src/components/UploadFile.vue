@@ -1,12 +1,14 @@
 <template>
-  <button id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
-    @drop.prevent="onDrop($event)" @click="onClick()">
-    <div class=" icon"><i class="fas fa-cloud-upload-alt"></i></div>
-    <header id="drag-area-header" ref="dragText">drag & drop to upload video</header>
-    <span id="drag-area-span">- or -</span>
-    <button id="browse-btn" @click="onClick()">browse file</button>
-    <input id="file-input" type="file" hidden ref="fileInput" @change="onChange($event)">
-  </button>
+  <div id="wrapper">
+    <button id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
+      @drop.prevent="onDrop($event)" @click="onClick()">
+      <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+      <header id="drag-area-header" ref="dragText">drag & drop to upload video</header>
+      <span id="drag-area-span">- or -</span>
+      <button id="browse-btn">browse file</button>
+      <input id="file-input" type="file" hidden ref="fileInput" @change="onChange($event)">
+    </button>
+  </div>
 </template>
 
 <script>
@@ -70,12 +72,17 @@ export default {
 </script>
 
 <style scoped>
+#wrapper {
+  flex: 1;
+  display: flex;
+}
+
 #drag-area {
-  border: 2px dashed var(--primary-color);
-  background: var(--secondary-color);
-  height: 80vh;
-  width: 80%;
-  border-radius: 5px;
+  flex: 1;
+  border: 1px dashed var(--secondary-color);
+  background: var(--background-color);
+  margin: 5%;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,26 +100,26 @@ export default {
 }
 
 #drag-area-header {
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 500;
   color: var(--primary-color);
 }
 
 #drag-area-span {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--primary-color);
   margin: 10px 0 15px 0;
 }
 
 #browse-btn {
-  padding: 10px 25px;
+  padding: 10px 20px;
   font-size: 20px;
   font-weight: 500;
   border: none;
   outline: none;
-  background: var(--tertiary-color);
-  color: var(--secondary-color);
+  background: var(--accent-color);
+  color: var(--background-color);
   border-radius: 5px;
   cursor: pointer;
 }

@@ -1,18 +1,15 @@
 <template>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
   <div id="app" :style="cssProps">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <RouterView />
   </div>
 </template>
 
 <script>
-import UploadFile from './components/UploadFile.vue'
 
 export default {
   name: 'App',
-  components: {
-    UploadFile
-  },
   mounted() {
     const openCvScript = document.createElement('script')
     openCvScript.src = "./scripts/opencv.js"
@@ -22,10 +19,12 @@ export default {
   computed: {
     cssProps() {
       return {
-        '--background-color': '#121212',
-        '--primary-color': '#BB86FC',
-        '--secondary-color': '#1F1B24',
-        '--tertiary-color': '#03DAC5'
+        // '--background-color': '#212121',
+        '--background-color': '#fff',
+        '--primary-color': '#7f22fd',
+        // '--secondary-color': '#999',
+        '--secondary-color': '#222',
+        '--accent-color': '#00b3a6',
       }
     }
   }
@@ -47,12 +46,10 @@ export default {
   min-width: 100%;
   margin: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--background-color);
 }
 
 .btn {
-  padding: 0 5px 0 5px;
+  padding: 0 5px;
 }
 </style>

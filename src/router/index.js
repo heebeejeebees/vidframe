@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import UploadFile from "@/components/UploadFile.vue";
 import HelloWorld from "@/components/HelloWorld.vue";
 import ChartResult from "@/components/ChartResult.vue";
+import Home from "@/components/Home.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: "/",
       name: "Home",
-      component: UploadFile,
+      component: Home,
     },
     {
       path: "/result",
