@@ -74,15 +74,20 @@ export default {
      * main function to process video after upload
      */
     async processVideoTrack(video) {
-      {
-        if (window.MediaStreamTrackProcessor) {
-          this.readChunk(new MediaStreamTrackProcessor(await this.getVideoTrack(video)));
+      if (window.MediaStreamTrackProcessor) {
+        const videoTrack = await this.getVideoTrack(video);
+        if (videoTrack) {
+          this.readChunk(new MediaStreamTrackProcessor(videoTrack));
+          return;
         } else {
-          alert(
-            "Your browser doesn't support this API yet, try other Chromium browsers"
-          );
+          alert("Lost video source, restarting.")
         }
-      };
+      } else {
+        alert(
+          "Your browser doesn't support this API yet, try other Chromium browsers."
+        );
+      }
+      this.goHome();
     },
     /**
      * reads VideoFrame recursively by frame
@@ -153,9 +158,12 @@ export default {
  * @returns array of MediaStreamTrack
  */
     async getVideoTrack(video) {
-      // 'https://va.media.tumblr.com/tumblr_rwuc149ydj1a6n417_720.mp4';
       // TODO need demuxer/converter for .mov etc
-      await video.play();
+      try {
+        await video.play();
+      } catch (err) {
+        return;
+      }
       // TODO add progress bar based on video length 1sec/sec:
       // https://www.codingnepalweb.com/file-upload-with-progress-bar-html-javascript/
       const [track] = video.captureStream().getVideoTracks();
