@@ -2,6 +2,8 @@
   <div id="container">
     <img id="banner" src="../../public/vidfra.me.jpg" />
     <h3>What does it do?</h3>
+    -
+    <!-- to be moved-->
     <label for="metric">Choose an image metric to calculate per video frame:</label>
     <select name="metric" id="metric">
       <option value="laplacian_variance">Laplacian Variance</option>
@@ -11,6 +13,7 @@
     for encoding and decoding of audio, video, and images.
     <h3>Future Enhancements</h3>
     <h3>Feedback?</h3>
+    <h3>Advertisements</h3>
     <h3>Ko-fi</h3>
   </div>
 </template>
