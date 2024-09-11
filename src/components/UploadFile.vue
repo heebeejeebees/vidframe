@@ -54,6 +54,7 @@ export default {
       let imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
       if (vidExts.includes(fileType)) {
         blobStore.mutations.setBlob(file);
+        // TODO show process button
         this.goToResult();
       } else if (imgExts.includes(fileType)) {
         // TODO calculate as one frame
