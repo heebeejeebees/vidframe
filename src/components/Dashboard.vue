@@ -9,8 +9,8 @@
       <option value="laplacian_variance">Laplacian Variance</option>
     </select>
     <h3>Browser Compatibility</h3>
-    Only "Chromium" browsers are <a href="https://caniuse.com/webcodecs">compatible</a>
-    for encoding and decoding of audio, video, and images.
+    <p>Only "Chromium" browsers are <a href="https://caniuse.com/webcodecs">compatible</a>
+      for encoding and decoding of audio, video, and images.</p>
     <h3>Future Enhancements</h3>
     <h3>Feedback?</h3>
     <h3>Advertisements</h3>
