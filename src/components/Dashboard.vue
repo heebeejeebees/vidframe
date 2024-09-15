@@ -36,5 +36,8 @@ export default {
 
 #banner {
   margin: 5%;
+  height: 200px;
+  max-width: 100%;
+  object-fit: cover;
 }
 </style>
