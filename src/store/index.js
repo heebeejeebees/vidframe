@@ -18,6 +18,9 @@ const blobStore = {
     initializeBlob() {
       blobStore.state.blob = new Blob();
     },
+    clearBlob() {
+      blobStore.state.blob = null;
+    },
   },
 };
 

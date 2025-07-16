@@ -1,10 +1,11 @@
 <template>
   <div id="video-wrapper" ref="videoWrapper">
     <div id="controls" ref="videoControls">
-      <button id="download-btn" class="btn" ref="downloadBtn">download</button>
       <button id="reset-zoom-btn" class="btn" ref="resetZoomBtn">
         <i class="fas fa-undo"></i>
       </button>
+      <button id="download-btn" class="btn" ref="downloadBtn">download</button>
+      <button id="restart-btn" class="btn" ref="restartBtn">restart</button>
     </div>
     <canvas id="timeline" ref="timelineCanvas"></canvas>
     <canvas id="annotation" ref="annotCanvas"></canvas>
@@ -28,11 +29,14 @@ const annotCanvas = ref(null);
 const frameCanvas = ref(null);
 const downloadBtn = ref(null);
 const resetZoomBtn = ref(null);
+const restartBtn = ref(null);
 
 
 const frames = [];
 let offscreenCanvas;
 let offscreenCtx;
+
+let chart = null;
 
 export default {
   name: 'ChartResult',
@@ -53,7 +57,8 @@ export default {
       annotCanvas,
       frameCanvas,
       downloadBtn,
-      resetZoomBtn
+      resetZoomBtn,
+      restartBtn
     }
   },
   methods: {
@@ -238,7 +243,7 @@ export default {
       let axisY;
       let bitmap;
       let isDragging = false;
-      const chart = new Chart(timelineCanvas.value, {
+      chart = new Chart(timelineCanvas.value, {
         type: 'line',
         data: {
           labels: frames.map((frame) => frame.timestamp),
@@ -316,13 +321,15 @@ export default {
           {
             resize: (_chart, args) => {
               // update annotation canvas to be same as timeline chart canvas
-              if (annotCanvas.value.width !== args.size.width) {
-                annotCanvas.value.width = args.size.width;
-                annotCanvas.value.style.width = args.size.width + 'px';
-              }
-              if (annotCanvas.value.height !== args.size.height) {
-                annotCanvas.value.height = args.size.height;
-                annotCanvas.value.style.height = args.size.height + 'px';
+              if (annotCanvas.value) {
+                if (annotCanvas.value.width !== args.size.width) {
+                  annotCanvas.value.width = args.size.width;
+                  annotCanvas.value.style.width = args.size.width + 'px';
+                }
+                if (annotCanvas.value.height !== args.size.height) {
+                  annotCanvas.value.height = args.size.height;
+                  annotCanvas.value.style.height = args.size.height + 'px';
+                }
               }
             },
             afterEvent: (chart, args) => {
@@ -350,7 +357,7 @@ export default {
               ) {
                 isDragging = false;
 
-                // update download
+                // update download button
                 downloadBtn.value.onclick = () => {
                   const downloadLink = document.createElement('a');
                   downloadLink.download = `${frames[dataX].timestamp} picked by vidfra.me.png`;
@@ -358,6 +365,34 @@ export default {
                   downloadLink.click();
                 };
                 downloadBtn.value.style.display = 'block';
+
+                // update restart button
+                restartBtn.value.onclick = () => {
+                  restartBtn.value.style.display = 'none';
+
+                  // TODO clear up previous processed videos
+                  // videoWrapper.value = null
+                  // video.value = null
+                  // videoControls.value = null
+
+                  // timelineCanvas.value = null;
+                  // annotCanvas.value = null;
+                  // frameCanvas.value = null;
+                  // downloadBtn.value = null;
+                  // resetZoomBtn.value = null;
+                  // restartBtn.value = null;
+
+                  // frames = [];
+                  // offscreenCanvas = null;
+                  // offscreenCtx = null;
+
+                  // chart = null;
+                  // blobStore.actions.clearBlob();
+                  // console.log("unmounted");
+
+                  this.goHome();
+                }
+                restartBtn.value.style.display = 'block';
 
                 if (eventType !== 'mouseleave') {
                   // draw selected frame vertical line
@@ -423,6 +458,10 @@ export default {
   display: none;
   width: 30px;
   padding: 0;
+}
+
+#restart-btn {
+  display: none;
 }
 
 #controls>* {
