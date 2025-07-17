@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import blobStore from '@/store';
+import { blobStore } from '@/store';
 import { ref } from 'vue';
 
 const dragArea = ref(null)
@@ -66,7 +66,8 @@ export default {
       }
     },
     goToResult() {
-      this.$router.replace({ name: 'Result' });
+      // this.$router.replace({ name: 'Result' });
+      this.$router.replace({ name: 'Process' });
     },
   }
 }

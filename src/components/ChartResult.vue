@@ -1,5 +1,5 @@
 <template>
-  <div id="video-wrapper" ref="videoWrapper">
+  <div id="chart-wrapper" ref="chartWrapper">
     <div id="controls" ref="videoControls">
       <button id="reset-zoom-btn" class="btn" ref="resetZoomBtn">
         <i class="fas fa-undo"></i>
@@ -10,18 +10,15 @@
     <canvas id="timeline" ref="timelineCanvas"></canvas>
     <canvas id="annotation" ref="annotCanvas"></canvas>
     <canvas id="frame" ref="frameCanvas"></canvas>
-    <video id="video" ref="video" muted crossorigin="anonymous" playbackRate="1"></video>
   </div>
 </template>
 
 <script>
-import blobStore from '@/store';
+import { framesStore } from '@/store';
 import { ref } from 'vue';
 import Chart from 'chart.js/auto';
-import { transformMicrosecondsToTimestamp, canvasDrawImage, getLaplacianVar } from '../utils';
+import { canvasDrawImage } from '../utils';
 
-const videoWrapper = ref(null)
-const video = ref(null)
 const videoControls = ref(null)
 
 const timelineCanvas = ref(null);
@@ -31,27 +28,20 @@ const downloadBtn = ref(null);
 const resetZoomBtn = ref(null);
 const restartBtn = ref(null);
 
-
-const frames = [];
-let offscreenCanvas;
-let offscreenCtx;
-
 let chart = null;
 
 export default {
   name: 'ChartResult',
   mounted() {
-    const file = blobStore.getters.getBlob();
-    if (file) {
-      this.processVideo(file);
+    const frames = framesStore.getters.getFrames();
+    if (frames || frames.size() == 0) {
+      this.plotTimeline(frames);
     } else {
       this.goHome();
     }
   },
   setup() {
     return {
-      videoWrapper,
-      video,
       videoControls,
       timelineCanvas,
       annotCanvas,
@@ -62,131 +52,6 @@ export default {
     }
   },
   methods: {
-    processVideo(file) {
-      const fileReader = new FileReader();
-      fileReader.onload = async () => {
-
-        video.value.src = fileReader.result;
-        video.value.type = file.type;
-        videoWrapper.value.append(video.value);
-        await this.processVideoTrack(video.value);
-        // TODO allow user to remove/replace current file
-      };
-
-      fileReader.readAsDataURL(file);
-    },
-    /**
-     * main function to process video after upload
-     */
-    async processVideoTrack(video) {
-      if (window.MediaStreamTrackProcessor) {
-        const videoTrack = await this.getVideoTrack(video);
-        if (videoTrack) {
-          this.readChunk(new MediaStreamTrackProcessor(videoTrack));
-          return;
-        } else {
-          alert("Lost video source, restarting.")
-        }
-      } else {
-        alert(
-          "Your browser doesn't support this API yet, try other Chromium browsers."
-        );
-      }
-      this.goHome();
-    },
-    /**
-     * reads VideoFrame recursively by frame
-     * @param {MediaStreamTrackProcessor} processor of uploaded HTMLElement video
-     */
-    readChunk(processor) {
-      const self = this;
-      const reader = processor.readable.getReader();
-      let hasWarned = false;
-      let microsecondsOffset = null;
-      reader.read().then(async function processFrames({ done, value }) {
-        // `value` type == VideoFrame
-        // see https://developer.mozilla.org/en-US/docs/Web/API/VideoFrame
-        if (value) {
-          const bitmap = await createImageBitmap(value);
-
-          // instantiate offscreen canvas on first run
-          if (!offscreenCanvas) {
-            offscreenCanvas = new OffscreenCanvas(
-              value.displayWidth,
-              value.displayHeight
-            );
-            offscreenCtx = offscreenCanvas.getContext('2d', {
-              willReadFrequently: true,
-            });
-          }
-          offscreenCtx.drawImage(bitmap, 0, 0);
-
-          // enhance: calculate primary/selected colour %, audio dB + pitch,
-          // calculate laplacian variance
-          let lapVar = null;
-          try {
-            lapVar = getLaplacianVar(offscreenCanvas);
-          } catch (e) {
-            if (!hasWarned) {
-              hasWarned = true;
-              alert(e.message);
-            }
-            lapVar = 0;
-          }
-
-          // to offset days worth of extra microseconds, as it still increments as video plays
-          if (microsecondsOffset == null) {
-            microsecondsOffset = value.timestamp;
-          }
-
-          frames.push({
-            index: frames.length,
-            bitmap,
-            data: {
-              laplacian_variance: lapVar,
-            },
-            timestamp: transformMicrosecondsToTimestamp(value.timestamp - microsecondsOffset),
-            timestamp_microseconds: value.timestamp - microsecondsOffset,
-          });
-          value.close();
-        }
-        if (!done) {
-          reader.read().then(processFrames);
-        } else {
-          reader.releaseLock();
-          offscreenCanvas = null;
-          offscreenCtx = null;
-          console.log(
-            `video processed: ${frames.length} frames, ${frames[frames.length - 1].timestamp_microseconds
-            }`
-          );
-          self.plotTimeline(frames);
-        }
-      });
-    },
-    /**
- * get MediaStream Video Tracks from upload
- * https://stackoverflow.com/a/32708998/9018350
- * @param {HTMLElement} video created from user's file upload
- * @returns array of MediaStreamTrack
- */
-    async getVideoTrack(video) {
-      // TODO need demuxer/converter for .mov etc
-      try {
-        await video.play();
-      } catch (err) {
-        return;
-      }
-      // TODO add progress bar based on video length 1sec/sec:
-      // https://www.codingnepalweb.com/file-upload-with-progress-bar-html-javascript/
-      const [track] = video.captureStream().getVideoTracks();
-      video.onended = () => {
-        track.stop();
-        video.remove();
-      };
-      return track;
-    },
-
     /**
      * draw vertical line on canvas
      * @param {OffscreenCanvasRenderingContext2D } ctx
@@ -371,7 +236,7 @@ export default {
                   restartBtn.value.style.display = 'none';
 
                   // TODO clear up previous processed videos
-                  // videoWrapper.value = null
+                  // chartWrapper.value = null
                   // video.value = null
                   // videoControls.value = null
 
@@ -389,6 +254,7 @@ export default {
                   // chart = null;
                   // blobStore.actions.clearBlob();
                   // console.log("unmounted");
+                  framesStore.actions.clearFrames();
 
                   this.goHome();
                 }
@@ -431,7 +297,7 @@ export default {
 </script>
 
 <style scoped>
-#video-wrapper {
+#chart-wrapper {
   display: grid;
   height: 100%;
   width: 100%;
