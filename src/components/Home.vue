@@ -9,7 +9,7 @@
 import Dashboard from './Dashboard.vue';
 import UploadFile from './UploadFile.vue';
 export default {
-
+  name: 'Home',
   components: {
     Dashboard,
     UploadFile

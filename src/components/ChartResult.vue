@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { framesStore } from '@/store';
+import { blobStore, framesStore } from '@/store';
 import { ref } from 'vue';
 import Chart from 'chart.js/auto';
 import { canvasDrawImage } from '../utils';
@@ -34,7 +34,7 @@ export default {
   name: 'ChartResult',
   mounted() {
     const frames = framesStore.getters.getFrames();
-    if (frames || frames.size() == 0) {
+    if (frames && frames.length > 0) {
       this.plotTimeline(frames);
     } else {
       this.goHome();
@@ -67,6 +67,7 @@ export default {
       ctx.lineWidth = width;
       ctx.strokeStyle = color;
       ctx.stroke();
+      return true;
     },
 
     /**
@@ -79,7 +80,7 @@ export default {
         willReadFrequently: true,
       });
       annotCtx.clearRect(0, 0, annotCanvas.value.width, annotCanvas.value.height);
-      this.drawVerticalLineFromX(annotCtx, axisY, pixelX, 'rgba(1,1,1,1)', 2);
+      return this.drawVerticalLineFromX(annotCtx, axisY, pixelX, 'rgba(1,1,1,1)', 2);
     }
     ,
     /**
@@ -93,9 +94,9 @@ export default {
         willReadFrequently: true,
       });
       // show selected video frame
-      canvasDrawImage(frameCanvas.value, frameCtx, /* frames[dataX]. */ bitmap);
+      canvasDrawImage(frameCanvas.value, frameCtx, bitmap);
       // draw selected frame vertical line
-      this.clearAndDrawAnnotation(axisY, pixelX);
+      return this.clearAndDrawAnnotation(axisY, pixelX);
     },
 
     /**
@@ -107,6 +108,7 @@ export default {
       let dataX;
       let axisY;
       let bitmap;
+      let hasSelected = false;
       let isDragging = false;
       chart = new Chart(timelineCanvas.value, {
         type: 'line',
@@ -197,10 +199,24 @@ export default {
                 }
               }
             },
+            afterRender: (chart, args, options) => {
+              if (restartBtn.value.style.display !== 'block') {
+                // update restart button
+                restartBtn.value.onclick = () => {
+                  restartBtn.value.style.display = 'none';
+                  framesStore.actions.clearFrames();
+
+                  this.goHome();
+                }
+                restartBtn.value.style.display = 'block';
+              }
+            },
             afterEvent: (chart, args) => {
               if (!chart.tooltip._active[0]) {
                 return;
               }
+
+
               /* for selecting and sliding across video frames */
               const {
                 event: { type: eventType },
@@ -214,7 +230,7 @@ export default {
               if (eventType === 'mousedown' || eventType === 'touchstart') {
                 isDragging = true;
                 // show selected
-                this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
+                hasSelected = this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
               } else if (
                 eventType === 'mouseup' ||
                 eventType === 'touchend' ||
@@ -223,42 +239,17 @@ export default {
                 isDragging = false;
 
                 // update download button
-                downloadBtn.value.onclick = () => {
-                  const downloadLink = document.createElement('a');
-                  downloadLink.download = `${frames[dataX].timestamp} picked by vidfra.me.png`;
-                  downloadLink.href = frameCanvas.value.toDataURL();
-                  downloadLink.click();
-                };
-                downloadBtn.value.style.display = 'block';
-
-                // update restart button
-                restartBtn.value.onclick = () => {
-                  restartBtn.value.style.display = 'none';
-
-                  // TODO clear up previous processed videos
-                  // chartWrapper.value = null
-                  // video.value = null
-                  // videoControls.value = null
-
-                  // timelineCanvas.value = null;
-                  // annotCanvas.value = null;
-                  // frameCanvas.value = null;
-                  // downloadBtn.value = null;
-                  // resetZoomBtn.value = null;
-                  // restartBtn.value = null;
-
-                  // frames = [];
-                  // offscreenCanvas = null;
-                  // offscreenCtx = null;
-
-                  // chart = null;
-                  // blobStore.actions.clearBlob();
-                  // console.log("unmounted");
-                  framesStore.actions.clearFrames();
-
-                  this.goHome();
+                if (hasSelected) {
+                  downloadBtn.value.onclick = () => {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.download = `${frames[dataX ?? 0].timestamp} picked by vidfra.me.png`;
+                    downloadLink.href = frameCanvas.value.toDataURL();
+                    downloadLink.click();
+                  }
+                  if (downloadBtn.value.style.display !== 'block') {
+                    downloadBtn.value.style.display = 'block';
+                  }
                 }
-                restartBtn.value.style.display = 'block';
 
                 if (eventType !== 'mouseleave') {
                   // draw selected frame vertical line
@@ -267,7 +258,7 @@ export default {
               } else if (eventType === 'mousemove' || eventType === 'touchmove') {
                 if (isDragging) {
                   // show selected
-                  this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
+                  hasSelected = this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
                 } else {
                   // draw and erase vertical line for hovering
                   const timelineCtx = timelineCanvas.value.getContext('2d', {
@@ -290,6 +281,7 @@ export default {
       });
     },
     goHome() {
+      blobStore.actions.clearBlob();
       this.$router.replace({ name: 'Home' });
     }
   }

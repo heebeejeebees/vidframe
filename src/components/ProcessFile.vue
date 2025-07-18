@@ -152,6 +152,7 @@ export default {
       return track;
     },
     goHome() {
+      framesStore.actions.clearFrames();
       this.$router.replace({ name: 'Home' });
     }
   }
