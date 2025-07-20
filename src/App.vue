@@ -20,11 +20,13 @@ export default {
     cssProps() {
       return {
         // '--background-color': '#212121',
-        '--background-color': '#fff',
+        '--background-color': '#1f282f',
         '--primary-color': '#7f22fd',
         // '--secondary-color': '#999',
-        '--secondary-color': '#222',
+        '--secondary-color': '#999',
         '--accent-color': '#00b3a6',
+        '--font-h-color': '#fff',
+        '--font-p-color': '#fafeff',
       }
     }
   }
