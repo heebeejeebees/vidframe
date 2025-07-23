@@ -1,13 +1,13 @@
 <template>
   <div id="container">
-    <button id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
+    <div id="drag-area" ref="dragArea" @dragleave="onDragleave()" @dragover.prevent="onDragover()"
       @drop.prevent="onDrop($event)" @click="onClick()">
-      <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+      <div class="icon icon-custom-size"><i class="fas fa-cloud-upload-alt"></i></div>
       <header id="drag-area-header" ref="dragText">drag & drop to upload video</header>
       <span id="drag-area-span">- or -</span>
       <button id="browse-btn">browse file</button>
       <input id="file-input" type="file" hidden ref="fileInput" @change="onChange($event)">
-    </button>
+    </div>
   </div>
 </template>
 

@@ -19,12 +19,10 @@ export default {
   computed: {
     cssProps() {
       return {
-        // '--background-color': '#212121',
         '--background-color': '#1f282f',
-        '--primary-color': '#7f22fd',
-        // '--secondary-color': '#999',
+        '--primary-color': '#ad85fe',
         '--secondary-color': '#999',
-        '--accent-color': '#00b3a6',
+        '--accent-color': '#33e9dc',
         '--font-h-color': '#fff',
         '--font-p-color': '#fafeff',
       }

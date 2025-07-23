@@ -1,4 +1,26 @@
-# vidframe
+# VideoFra.me
+
+## To-do's
+
+### MVP:
+Progress bar
+Captcha
+Advertisement
+Ko-fi
+Basic backend
+
+### Future:
+Video/GIF demo
+Crop videos
+Convert videos
+Housekeep
+New algorithms
+Enhanced backend
+
+### Popular:
+Feedback system
+Trial + Account quotas
+Freemium membership
 
 ## Project setup
 ```
