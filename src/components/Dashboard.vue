@@ -7,6 +7,8 @@
       <p>Still taking screenshots from your videos? Easily extract original-resolution photos from any video. Our tool
         analyzes every frame unto a graph so you can find and download the perfect still image instantly.</p>
 
+      <img id="demo-gif" src="../../public/Video_Demonstration.gif" alt="And then, you select a frame">
+
       <label id="metric-label" for="metric">Choose an image metric to calculate per video
         frame: </label>
       <select id="metric-select" name="metric" ref="metricSelect">
@@ -56,8 +58,8 @@
       </CAccordionItem>
 
       <CAccordionItem :item-key="5">
-        <CAccordionHeader>Ko-fi</CAccordionHeader>
-        <CAccordionBody>Remove from accordion</CAccordionBody>
+        <CAccordionHeader>Donate</CAccordionHeader>
+        <CAccordionBody>Ko-fi: Remove from accordion</CAccordionBody>
       </CAccordionItem>
     </CAccordion>
 
@@ -96,11 +98,25 @@ const metricSelect = ref(null);
 }
 
 h1 {
-  color: var(--font-h-color)
+  color: var(--font-h-color);
+  font-size: 2rem;
+  margin: 8px 0;
 }
 
 p {
   color: var(--font-p-color);
+}
+
+#metric-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#demo-gif {
+  height: 204px;
+  width: 400px;
+  align-self: center;
+  margin: 0 0 16px;
 }
 
 #metric-label {
@@ -109,13 +125,14 @@ p {
 
 #metric-select {
   padding: 5px 10px;
-  margin: 0 5px;
+  margin: 8px 0;
   border: none;
   outline: none;
   background: var(--primary-color);
-  color: var(--font-h-color);
+  color: var(--background-color);
   border-radius: 5px;
   cursor: pointer;
+  width: min-content;
 }
 
 #accordion {

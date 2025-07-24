@@ -6,6 +6,7 @@
 Progress bar
 Captcha
 Advertisement
+Adblocker remover
 Ko-fi
 Basic backend
 
