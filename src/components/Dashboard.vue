@@ -88,8 +88,7 @@ const metricSelect = ref(null);
 }
 
 #banner {
-  height: 200px;
-  max-width: 100%;
+  max-width: 400px;
   object-fit: cover;
 }
 

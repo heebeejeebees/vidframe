@@ -31,7 +31,7 @@ export default {
     },
     onChange(e) {
       const target = e.target;
-      if (target && target.files) {
+      if (target && target.files && target.files[0]) {
         dragArea.value.classList.add('active');
         this.validateFile(target.files[0]);
       }

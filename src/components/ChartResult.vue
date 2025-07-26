@@ -302,7 +302,7 @@ export default {
   display: flex;
   position: absolute;
   bottom: 0;
-  height: 50px;
+  height: min-content;
   width: 100%;
   justify-content: center;
   z-index: 4;
@@ -310,20 +310,47 @@ export default {
 
 #download-btn {
   display: none;
+  padding: 5px 10px;
+  margin: 8px 0;
+  border: none;
+  outline: none;
+  background: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 5px;
+  cursor: pointer;
+  width: min-content;
 }
 
 #reset-zoom-btn {
   display: none;
   width: 30px;
   padding: 0;
+  /* padding: 5px 10px; */
+  margin: 8px 0;
+  border: none;
+  outline: none;
+  background: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 5px;
+  cursor: pointer;
+  /* width: min-content; */
 }
 
 #restart-btn {
   display: none;
+  padding: 5px 10px;
+  margin: 8px 0;
+  border: none;
+  outline: none;
+  background: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 5px;
+  cursor: pointer;
+  width: min-content;
 }
 
 #controls>* {
-  margin: 10px 5px;
+  margin: 0 5px 4vw;
 }
 
 #annotation {
@@ -341,8 +368,6 @@ export default {
 }
 
 #timeline {
-  height: 100%;
-  width: 100%;
   position: absolute;
   z-index: 3;
 }
