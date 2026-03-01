@@ -53,6 +53,7 @@ export default {
       let vidExts = ['video/mp4', 'video/ogg', 'video/webm'];
       let imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
       if (vidExts.includes(fileType)) {
+        // TODO call API here then store
         blobStore.mutations.setBlob(file);
         // TODO show process button
         this.goToResult();

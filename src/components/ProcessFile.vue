@@ -21,6 +21,7 @@ export default {
   mounted() {
     const file = blobStore.getters.getBlob();
     if (file) {
+      // TODO show loading bar
       this.processVideo(file);
     } else {
       this.goHome();
