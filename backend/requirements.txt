@@ -16,10 +16,14 @@ opencv-python==4.13.0.92
 packaging==26.0
 pydantic==2.12.5
 pydantic_core==2.41.5
+psycopg[binary]==3.2.6
 python-dateutil==2.9.0.post0
+python-multipart==0.0.20
+redis==5.2.1
 s3transfer==0.16.0
 six==1.17.0
 slowapi==0.1.9
+SQLAlchemy==2.0.38
 starlette==0.52.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
@@ -27,3 +31,5 @@ urllib3==2.6.3
 uvicorn==0.41.0
 wheel==0.45.1
 wrapt==2.1.1
+redis==5.2.1
+SQLAlchemy==2.0.38

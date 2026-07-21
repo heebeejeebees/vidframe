@@ -49,17 +49,20 @@ export default {
     },
     validateFile(file) {
       const fileType = file.type;
-      // TODO 'video/quicktime', .gif, and other file types to be demuxed and supported
-      let vidExts = ['video/mp4', 'video/ogg', 'video/webm'];
-      let imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
+      const vidExts = [
+        'video/mp4',
+        'video/ogg',
+        'video/webm',
+        'video/quicktime',
+        'video/x-msvideo',
+        'video/x-matroska'
+      ];
+      const imgExts = ['image/jpeg', 'image/jpg', 'image/png'];
       if (vidExts.includes(fileType)) {
-        // TODO call API here then store
         blobStore.mutations.setBlob(file);
-        // TODO show process button
         this.goToResult();
       } else if (imgExts.includes(fileType)) {
-        // TODO calculate as one frame
-        alert('Image detected');
+        alert('Image processing is not available yet. Please upload a video.');
       } else {
         alert('This is not a supported file');
         dragArea.value.classList.remove('active');
@@ -67,7 +70,6 @@ export default {
       }
     },
     goToResult() {
-      // this.$router.replace({ name: 'Result' });
       this.$router.replace({ name: 'Process' });
     },
   }

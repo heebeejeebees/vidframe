@@ -18,6 +18,7 @@ import { blobStore, framesStore } from '@/store';
 import { ref } from 'vue';
 import Chart from 'chart.js/auto';
 import { canvasDrawImage } from '../utils';
+import { buildFrameDownloadUrl, buildFramePreviewUrl } from '../utils/api';
 
 const videoControls = ref(null)
 
@@ -89,14 +90,29 @@ export default {
      * @param {Scale} axisY of timeline
      * @param {number} pixelX x-value in pixels
      */
-    updateFrameAndAnnotation(bitmap, axisY, pixelX) {
+    async updateFrameAndAnnotation(frameIndex, axisY, pixelX) {
       const frameCtx = frameCanvas.value.getContext('2d', {
         willReadFrequently: true,
       });
-      // show selected video frame
+      const jobId = framesStore.getters.getJobId();
+      if (!jobId) {
+        return false;
+      }
+
+      const imageUrl = buildFramePreviewUrl(jobId, frameIndex);
+      const bitmap = await this.loadFrameBitmap(imageUrl);
       canvasDrawImage(frameCanvas.value, frameCtx, bitmap);
       // draw selected frame vertical line
       return this.clearAndDrawAnnotation(axisY, pixelX);
+    },
+
+    async loadFrameBitmap(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to load frame preview.');
+      }
+      const blob = await response.blob();
+      return createImageBitmap(blob);
     },
 
     /**
@@ -107,7 +123,7 @@ export default {
       let pixelX;
       let dataX;
       let axisY;
-      let bitmap;
+       let selectedFrameIndex = 0;
       let hasSelected = false;
       let isDragging = false;
       chart = new Chart(timelineCanvas.value, {
@@ -139,6 +155,9 @@ export default {
                 },
                 mode: 'xy',
                 onZoom: () => {
+                  const annotCtx = annotCanvas.value.getContext('2d', {
+                    willReadFrequently: true,
+                  });
                   resetZoomBtn.value.onclick = () => {
                     chart.resetZoom();
                     resetZoomBtn.value.style.display = 'none';
@@ -225,12 +244,18 @@ export default {
               pixelX = chart.tooltip._active[0].element.x;
               dataX = chart.scales.x.getValueForPixel(pixelX);
               axisY = chart.scales.y;
-              bitmap = frames[dataX].bitmap;
+              selectedFrameIndex = frames[dataX].index;
 
               if (eventType === 'mousedown' || eventType === 'touchstart') {
                 isDragging = true;
                 // show selected
-                hasSelected = this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
+                this.updateFrameAndAnnotation(selectedFrameIndex, axisY, pixelX)
+                  .then((ok) => {
+                    hasSelected = ok;
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                  });
               } else if (
                 eventType === 'mouseup' ||
                 eventType === 'touchend' ||
@@ -241,9 +266,12 @@ export default {
                 // update download button
                 if (hasSelected) {
                   downloadBtn.value.onclick = () => {
+                    const jobId = framesStore.getters.getJobId();
+                    if (!jobId) {
+                      return;
+                    }
                     const downloadLink = document.createElement('a');
-                    downloadLink.download = `${frames[dataX ?? 0].timestamp} picked by vidfra.me.png`;
-                    downloadLink.href = frameCanvas.value.toDataURL();
+                    downloadLink.href = buildFrameDownloadUrl(jobId, selectedFrameIndex);
                     downloadLink.click();
                   }
                   if (downloadBtn.value.style.display !== 'block') {
@@ -258,7 +286,13 @@ export default {
               } else if (eventType === 'mousemove' || eventType === 'touchmove') {
                 if (isDragging) {
                   // show selected
-                  hasSelected = this.updateFrameAndAnnotation(bitmap, axisY, pixelX);
+                  this.updateFrameAndAnnotation(selectedFrameIndex, axisY, pixelX)
+                    .then((ok) => {
+                      hasSelected = ok;
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                    });
                 } else {
                   // draw and erase vertical line for hovering
                   const timelineCtx = timelineCanvas.value.getContext('2d', {

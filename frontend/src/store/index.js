@@ -27,15 +27,22 @@ const blobStore = {
 const framesStore = {
   state: reactive({
     frames: null,
+    jobId: null,
   }),
   getters: {
     getFrames() {
       return framesStore.state.frames;
     },
+    getJobId() {
+      return framesStore.state.jobId;
+    },
   },
   mutations: {
     setFrames(frames) {
       framesStore.state.frames = frames;
+    },
+    setJobId(jobId) {
+      framesStore.state.jobId = jobId;
     },
   },
   actions: {
@@ -55,6 +62,7 @@ const framesStore = {
     },
     clearFrames() {
       framesStore.state.frames = [];
+      framesStore.state.jobId = null;
     },
   },
 };
